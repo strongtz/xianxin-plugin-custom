@@ -30,101 +30,101 @@ export class bilibili extends plugin {
       event: "message",
       priority: 500,
       rule: [
-        {
-          reg: "^#*up\\s*[0-9]*$",
-          fnc: "detail",
-          event: "message.group",
-        },
-        {
-          reg: "^#*(添加|订阅|新增|增加)up推送\\s*(直播\\s*|视频\\s*|图文\\s*|文章\\s*|转发\\s*|直播\\s*)*.*$",
-          fnc: "addPush",
-          permission: "master",
-          event: "message.group",
-        },
-        {
-          reg: "^#*(删除|取消|移除|去除)up推送\\s*(直播\\s*|视频\\s*|图文\\s*|文章\\s*|转发\\s*|直播\\s*)*.*$",
-          fnc: "delPush",
-          permission: "master",
-          event: "message.group",
-        },
-        {
-          reg: "^#*推送(up)?列表$",
-          fnc: "listPush",
-          permission: "master",
-          event: "message.group",
-        },
-        {
-          reg: "^#*搜索up.*$",
-          fnc: "searchup",
-          permission: "master",
-          event: "message.group",
-        },
-        {
-          reg: "^#*手动推送up$",
-          fnc: "newPushTask",
-          permission: "master",
-          event: "message.group",
-        },
-        {
-          reg: '^#扫码(B|b)站登录$',
-          fnc: "BiliLogin",
-          event: 'message'
-        },
-        {
-          reg: '^#*我的*(b|B)站登录$',
-          event: 'message',
-          permission: "master",
-          fnc: 'myLogin'
-        },
-        {
-          reg: "^#*绑定*(b|B)站(ck|CK|cK|Ck)*(:|：)*.*$",
-          fnc: "bingBiliCk",
-          permission: "master",
-          event: 'message'
-        },
-        {
-          reg: '^#*我的*(b|B)站(ck|CK|Ck|Ck|cookie)$',
-          event: 'message',
-          permission: "master",
-          fnc: 'myBCk'
-        },
-        {
-          reg: '^#*(b|B)站(ck|CK|Ck|Ck|cookie)帮助$',
-          event: 'message',
-          fnc: 'BCkHelp'
-        },
-        {
-          reg: '^#*删除*(b|B)站(ck|CK|Ck|Ck|cookie)$',
-          event: 'message',
-          permission: "master",
-          fnc: 'delMyBCk'
-        },
-        {
-          reg: '^#删除(b|B)站登录$',
-          event: 'message',
-          permission: "master",
-          fnc: 'delLoginBCk'
-        },
-        {
-          reg: '^#*刷新*(b|B)站临时(ck|CK|Ck|Ck|cookie)$',
-          event: 'message',
-          permission: "master",
-          fnc: 'reflashTempBck'
-        },
+        // {
+        //   reg: "^#*up\\s*[0-9]*$",
+        //   fnc: "detail",
+        //   event: "message.group",
+        // },
+        // {
+        //   reg: "^#*(添加|订阅|新增|增加)up推送\\s*(直播\\s*|视频\\s*|图文\\s*|文章\\s*|转发\\s*|直播\\s*)*.*$",
+        //   fnc: "addPush",
+        //   permission: "master",
+        //   event: "message.group",
+        // },
+        // {
+        //   reg: "^#*(删除|取消|移除|去除)up推送\\s*(直播\\s*|视频\\s*|图文\\s*|文章\\s*|转发\\s*|直播\\s*)*.*$",
+        //   fnc: "delPush",
+        //   permission: "master",
+        //   event: "message.group",
+        // },
+        // {
+        //   reg: "^#*推送(up)?列表$",
+        //   fnc: "listPush",
+        //   permission: "master",
+        //   event: "message.group",
+        // },
+        // {
+        //   reg: "^#*搜索up.*$",
+        //   fnc: "searchup",
+        //   permission: "master",
+        //   event: "message.group",
+        // },
+        // {
+        //   reg: "^#*手动推送up$",
+        //   fnc: "newPushTask",
+        //   permission: "master",
+        //   event: "message.group",
+        // },
+        // {
+        //   reg: '^#扫码(B|b)站登录$',
+        //   fnc: "BiliLogin",
+        //   event: 'message'
+        // },
+        // {
+        //   reg: '^#*我的*(b|B)站登录$',
+        //   event: 'message',
+        //   permission: "master",
+        //   fnc: 'myLogin'
+        // },
+        // {
+        //   reg: "^#*绑定*(b|B)站(ck|CK|cK|Ck)*(:|：)*.*$",
+        //   fnc: "bingBiliCk",
+        //   permission: "master",
+        //   event: 'message'
+        // },
+        // {
+        //   reg: '^#*我的*(b|B)站(ck|CK|Ck|Ck|cookie)$',
+        //   event: 'message',
+        //   permission: "master",
+        //   fnc: 'myBCk'
+        // },
+        // {
+        //   reg: '^#*(b|B)站(ck|CK|Ck|Ck|cookie)帮助$',
+        //   event: 'message',
+        //   fnc: 'BCkHelp'
+        // },
+        // {
+        //   reg: '^#*删除*(b|B)站(ck|CK|Ck|Ck|cookie)$',
+        //   event: 'message',
+        //   permission: "master",
+        //   fnc: 'delMyBCk'
+        // },
+        // {
+        //   reg: '^#删除(b|B)站登录$',
+        //   event: 'message',
+        //   permission: "master",
+        //   fnc: 'delLoginBCk'
+        // },
+        // {
+        //   reg: '^#*刷新*(b|B)站临时(ck|CK|Ck|Ck|cookie)$',
+        //   event: 'message',
+        //   permission: "master",
+        //   fnc: 'reflashTempBck'
+        // },
       ],
     });
     this.bilibiliSetData = xxCfg.getConfig("bilibili", "set");
     this.bilibiliPushData = xxCfg.getConfig("bilibili", "push");
 
     /** 定时任务 */
-    this.task = {
-      cron: !!this.bilibiliSetData.pushStatus
-        ? this.bilibiliSetData.pushTime
-        : "",
-      name: "trss-xianxin插件---B站推送定时任务",
-      fnc: () => this.newPushTask(),
-      log: !!this.bilibiliSetData.pushTaskLog,
-    };
+    // this.task = {
+    //   cron: !!this.bilibiliSetData.pushStatus
+    //     ? this.bilibiliSetData.pushTime
+    //     : "",
+    //   name: "trss-xianxin插件---B站推送定时任务",
+    //   fnc: () => this.newPushTask(),
+    //   log: !!this.bilibiliSetData.pushTaskLog,
+    // };
   }
 
   async newPushTask() {

@@ -1,0 +1,56 @@
+"313047773":
+  - e_self_id: 1013554829
+    uid: "238352216"
+    name: 小太阳ACA
+    type: []
+"721255946":
+  - e_self_id: 2358537523
+    uid: "401742377"
+    name: 原神
+    type:
+      - DYNAMIC_TYPE_LIVE_RCMD
+"737223105":
+  - uid: "238352216"
+    name: 小太阳ACA
+    type: []
+  - uid: "401742377"
+    name: 原神
+    type:
+      - DYNAMIC_TYPE_LIVE_RCMD
+      - DYNAMIC_TYPE_AV
+  - uid: "676068875"
+    name: Renegade-Project
+    type: []
+  - uid: "11276497"
+    name: Sakuramist
+    type: []
+  - uid: "3546622923377024"
+    name: what
+    type: []
+  - e_self_id: 1013554829
+    uid: "384668604"
+    name: Nonx_
+    type: []
+  - e_self_id: 1013554829
+    uid: "573160"
+    name: 点心哪里有点心
+    type: []
+"906593931":
+  - uid: "401742377"
+    name: 原神
+    type: []
+  - uid: "472729452"
+    name: 飞翔的丘丘人
+    type: []
+  - uid: "1593381854"
+    name: 原神动画项目
+    type: []
+  - uid: "1669328690"
+    name: 派蒙的工作笔记
+    type: []
+  - uid: "602533983"
+    name: 派蒙的素材笔记本
+    type: []
+  - uid: "11276497"
+    name: Sakuramist
+    type: []

@@ -6,6 +6,15 @@ import xxCfg from "../model/xxCfg.js";
 import fs from "node:fs";
 import https from "https";
 import http from "http";
+import path from "node:path";
+
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const sharp = (await import('sharp')).default;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 //项目路径
 const _path = process.cwd();
@@ -60,7 +69,8 @@ export class mystery extends plugin {
           permission: "master",
         },
         {
-          reg: "^#*(l)?sp\\s*[\u4e00-\u9fa5a-zA-Z]*\\s*[0-9]*$",
+          // reg: "^#*(l)?sp\\s*[\u4e00-\u9fa5a-zA-Z\u3040-\u309F\u30A0-\u30FF]*\\s*[0-9]*$",
+          reg: "^#*(l)?sp\\s*[\\u4e00-\\u9fa5a-zA-Z\\u3040-\\u309F\\u30A0-\\u30FF\\s]*\\s*[0-9]*$",
           fnc: "searchsp",
         },
         {
@@ -72,6 +82,10 @@ export class mystery extends plugin {
           reg: "^#*(神秘)?(pro)?换源\\s*.*$",
           fnc: "wocurl",
           permission: "master",
+        },
+        {
+          reg: "^#*/\*muteme\\s*[1-9]\\d*$",
+          fnc: "muteme",
         },
       ],
     });
@@ -126,7 +140,7 @@ export class mystery extends plugin {
       redis.set(key, "1", { EX: Number(this.mysterySetData.cd) });
     }
 
-    this.e.reply("触发探索未知的神秘空间，请稍等...", undefined, { recallMsg: 60, });
+    this.e.reply("触发探索未知的神秘空间，请稍等...", undefined, { recallMsg: 5, });
     let images = [];
     const isDimtown = this.mysterySetData.wocUrl.indexOf("dimtown.com") !== -1;
 
@@ -502,6 +516,30 @@ export class mystery extends plugin {
     }
   }
 
+  async muteme() {
+    const isPrivate = this.e.isPrivate;
+    if (isPrivate || !this.e.group.is_admin) {
+      return;
+    }
+
+    logger.info(`why muteme`);
+    let num;
+    try {
+      num = parseInt(this.e.msg.replace(/^#*\/*muteme\s*(\d+)$/, '$1'));
+      if (isNaN(num)) {
+          logger.info('Invalid number');
+      }
+    } catch (error) {
+      logger.info('Failed to extract number:', error);
+      num = null;
+    }
+    logger.info(`num=${num}`);
+    this.e.group.muteMember(this.e.sender.user_id, num);
+    await this.e.reply(
+      `喔喔喔喔喔喔你已被禁锢${num}秒`
+    );
+  }
+
   async searchsp() {
     let key = `Yz:lspstatus:${this.e.group_id || this.e.user_id}`;
 
@@ -528,25 +566,47 @@ export class mystery extends plugin {
     }
 
     let num =
-      this.e.msg.replace(/#*(l)?sp\s*[\u4e00-\u9fa5a-zA-Z]*\s*/g, "").trim() ||
+      this.e.msg.replace(/#*(l)?sp\s*[\u4e00-\u9fa5a-zA-Z\u3040-\u309F\u30A0-\u30FF]*\s*/g, "").trim() ||
       1;
+
+    // let keyword =
+    //   this.e.msg
+    //     .replace(/#*(l)?sp\s*/g, "")
+    //     .replace(num, "")
+    //     .trim() || "黑丝|白丝";
 
     let keyword =
       this.e.msg
-        .replace(/#*(l)?sp\s*/g, "")
-        .replace(num, "")
+        .replace(/^#*(l)?sp\s*/i, "")
+        .replace(/\s*\d+$/, "")  // 移除末尾的数字
         .trim() || "黑丝|白丝";
 
-    this.e.reply("触发探索未知的神秘空间，请稍等...", undefined, { recallMsg: 60, });
+    this.e.reply("触发探索未知的神秘空间，请稍等...", undefined, { recallMsg: 5, });
 
     const fetchData = await fetch(
-      `https://api.lolicon.app/setu/v2?tag=${keyword}&proxy=sex.nyan.xyz&num=${num}&r18=${this.e.msg.indexOf("lsp") !== -1 ? 1 : 0
+      `https://api.lolicon.app/setu/v2?proxy=i.yuki.sh&tag=${keyword}&num=${num}&excludeAI=true&r18=${this.e.msg.indexOf("lsp") !== -1 ? 1 : 0
       }`
     );
     const resJsonData = await fetchData.json();
+    logger.info(`tag=${keyword}`);
+    logger.info(JSON.stringify(resJsonData));
 
     let images = this.getJsonImages(JSON.stringify(resJsonData));
+    let pids = this.getJsonPid(JSON.stringify(resJsonData));
+    let titles = this.getJsonTitles(JSON.stringify(resJsonData));
+    let tagsList = this.getJsonTags(JSON.stringify(resJsonData));
 
+    for (let pid of pids) {
+      logger.info(`Pixiv ID: ${pid}`);
+    }
+
+    for (let title of titles) {
+      logger.info(`Title: ${title}`);
+    }
+  
+    for (let tags of tagsList) {
+      logger.info(`Tags: ${tags.join(', ')}`);
+    }
     const forwarder =
       this.mysterySetData.forwarder == "bot"
         ? { nickname: Bot.nickname, user_id: Bot.uin }
@@ -557,15 +617,62 @@ export class mystery extends plugin {
 
     if (images && images.length) {
       let msgList = [];
-      for (let imageItem of images) {
+      for (let i = 0; i < images.length; i++) {
+        let imageItem = images[i];
+        logger.info(`imageItem: ${imageItem}`);
+
+        let pid = pids[i];
+        let title = titles[i];
+        let tag = tagsList[i];
+
+        const filePath = path.resolve(__dirname, '../../../data/test/', `image_${pid}.jpg`);
+        let filepath_new;
+
+        await new Promise((resolve, reject) => {
+          const file = fs.createWriteStream(filePath);
+          https.get(imageItem, (response) => {
+            response.pipe(file).on('finish', () => {
+              fs.readFile(filePath, 'utf8', async (err, data) => {
+                if (err) {
+                  logger.error(`Error reading image: ${err}`);
+                  reject(err);
+                  return;
+                }
+                if (data.startsWith('<!DOCTYPE html>')) {
+                  // 图片损坏，设置 filepath_new 为 image_404.jpg
+                  logger.info('Downloaded image is invalid (HTML content)');
+                  filepath_new = path.resolve(__dirname, '../../../data/test/', 'image_404.jpg');
+                  resolve();
+                } else {
+                  // 图片正常，旋转图片
+                  const rotatedFilePath = filePath.replace('.jpg', '_rotate.jpg');
+                  await sharp(filePath)
+                    .rotate(90)
+                    .toFile(rotatedFilePath);
+                  logger.info(`Rotated image saved to: ${rotatedFilePath}`);
+                  filepath_new = rotatedFilePath;
+                  resolve();
+                }
+              });
+            });
+          }).on('error', (err) => {
+            logger.error(`Error downloading image: ${err}`);
+            reject(err);
+          });
+        });
+
         if (isPrivate) {
-          await this.e.reply(segment.image(imageItem), false, {
+          await this.e.reply(segment.image(`file://${filepath_new}`), false, {
             recallMsg: this.mysterySetData.delMsg,
           });
           await common.sleep(600);
         } else {
           msgList.push({
-            message: segment.image(imageItem),
+            message: segment.image(`file://${filepath_new}`),
+            ...forwarder,
+          });
+          msgList.push({
+            message: `Pixiv ID: ${pid}\nTitle: ${title}\nTags: ${tag}`,
             ...forwarder,
           });
         }
@@ -586,16 +693,16 @@ export class mystery extends plugin {
               Number(Math.random().toFixed(2)) * 100 <
               this.mysterySetData.mute
             ) {
-              let duration = Math.floor(Math.random() * 600) + 1;
+              let duration = Math.floor(Math.random() * 120) + 1;
               this.e.group.muteMember(this.e.sender.user_id, duration);
               await this.e.reply(
-                `不用等了，你想要的已经被神秘的力量吞噬了～ 并随手将你禁锢${duration}秒`, undefined, { recallMsg: 60, }
+                `不用等了，你想要的已经被神秘的力量吞噬了～ 并随手将你禁锢${duration}秒\n(Pixiv ID: ${pids[0]})\nTitle: ${titles[0]}\nTags: ${tagsList[0]}`, undefined, { recallMsg: 120, }
               );
             } else {
-              this.reply("不用等了，你想要的已经被神秘的力量吞噬了～", undefined, { recallMsg: 60, });
+              this.reply("不用等了，你想要的已经被神秘的力量吞噬了～\n(Pixiv ID: ${pids[0]})\nTitle: ${titles[0]}\nTags: ${tagsList[0]}", undefined, { recallMsg: 90, });
             }
           } else {
-            this.reply("不用等了，你想要的已经被神秘的力量吞噬了～", undefined, { recallMsg: 60, });
+            this.reply(`不用等了，你想要的已经被神秘的力量吞噬了～\n(Pixiv ID: ${pids[0]})\nTitle: ${titles[0]}\nTags: ${tagsList[0]}`, undefined, { recallMsg: 90, });
           }
         }
       }
@@ -667,6 +774,37 @@ export class mystery extends plugin {
       images.push(encodeURI(img[1]));
     }
     return images;
+  }
+
+  getJsonPid(string) {
+    const pidRex = /"pid":(\d+)/g;
+    const pids = [];
+    let id;
+    while ((id = pidRex.exec(string))) {
+      pids.push(id[1]);
+    }
+    return pids;
+  }
+
+  getJsonTitles(string) {
+    const titleRex = /"title":"([^"]+)"/g;
+    const titles = [];
+    let title;
+    while ((title = titleRex.exec(string))) {
+      titles.push(title[1]);
+    }
+    return titles;
+  }
+  
+  getJsonTags(string) {
+    const tagsRex = /"tags":\[(.*?)\]/g;
+    const allTags = [];
+    let tagMatch;
+    while ((tagMatch = tagsRex.exec(string))) {
+      const tags = tagMatch[1].split(',').map(tag => tag.replace(/"/g, '').trim());
+      allTags.push(tags);
+    }
+    return allTags;
   }
 
   getJsonImages(string) {

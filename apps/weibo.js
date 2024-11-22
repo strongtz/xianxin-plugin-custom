@@ -26,59 +26,60 @@ export class weibo extends plugin {
       dsc: "微博相关指令",
       event: "message",
       priority: 500,
-      rule: [{
-          reg: "^#*博主\\s*[0-9]*$",
-          fnc: "detail",
-          event: "message.group",
-        },
-        {
-          reg: "^#*(添加|订阅|新增|增加)微博推送\\s*(视频\\s*|图文\\s*|文章\\s*|转发\\s*)*.*$",
-          fnc: "addPush",
-          permission: "master",
-          event: "message.group",
-        },
-        {
-          reg: "^#*(删除|取消|移除|去除)微博推送\\s*(视频\\s*|图文\\s*|文章\\s*|转发\\s*)*.*$",
-          fnc: "delPush",
-          permission: "master",
-          event: "message.group",
-        },
-        {
-          reg: "^#*推送(微博)?列表$",
-          fnc: "listPush",
-          permission: "master",
-          event: "message.group",
-        },
-        {
-          reg: "^#*搜索博主.*$",
-          fnc: "searchup",
-          permission: "master",
-          event: "message.group",
-        },
-        {
-          reg: "^#*手动推送微博$",
-          fnc: "newPushTask",
-          permission: "master",
-          event: "message.group",
-        },
-        {
-          reg: '^#*微博帮助$',
-          event: 'message',
-          fnc: 'weiboHelp'
-        },
+      rule: [
+        // {
+        //   reg: "^#*博主\\s*[0-9]*$",
+        //   fnc: "detail",
+        //   event: "message.group",
+        // },
+        // {
+        //   reg: "^#*(添加|订阅|新增|增加)微博推送\\s*(视频\\s*|图文\\s*|文章\\s*|转发\\s*)*.*$",
+        //   fnc: "addPush",
+        //   permission: "master",
+        //   event: "message.group",
+        // },
+        // {
+        //   reg: "^#*(删除|取消|移除|去除)微博推送\\s*(视频\\s*|图文\\s*|文章\\s*|转发\\s*)*.*$",
+        //   fnc: "delPush",
+        //   permission: "master",
+        //   event: "message.group",
+        // },
+        // {
+        //   reg: "^#*推送(微博)?列表$",
+        //   fnc: "listPush",
+        //   permission: "master",
+        //   event: "message.group",
+        // },
+        // {
+        //   reg: "^#*搜索博主.*$",
+        //   fnc: "searchup",
+        //   permission: "master",
+        //   event: "message.group",
+        // },
+        // {
+        //   reg: "^#*手动推送微博$",
+        //   fnc: "newPushTask",
+        //   permission: "master",
+        //   event: "message.group",
+        // },
+        // {
+        //   reg: '^#*微博帮助$',
+        //   event: 'message',
+        //   fnc: 'weiboHelp'
+        // },
       ],
     });
     this.weiboSetData = xxCfg.getConfig("weibo", "set");
     this.weiboPushData = xxCfg.getConfig("weibo", "push");
 
     /** 定时任务 */
-    this.task = {
-      cron: !!this.weiboSetData.pushStatus ?
-        this.weiboSetData.pushTime : "",
-      name: "trss-xianxin插件---微博推送定时任务",
-      fnc: () => this.newPushTask(),
-      log: !!this.weiboSetData.pushTaskLog,
-    };
+    // this.task = {
+    //   cron: !!this.weiboSetData.pushStatus ?
+    //     this.weiboSetData.pushTime : "",
+    //   name: "trss-xianxin插件---微博推送定时任务",
+    //   fnc: () => this.newPushTask(),
+    //   log: !!this.weiboSetData.pushTaskLog,
+    // };
   }
 
   async newPushTask() {
